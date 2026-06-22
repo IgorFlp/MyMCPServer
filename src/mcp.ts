@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from 'zod'
 import { decrypt, encrypt } from "./service.ts";
 import { MIMEType } from "node:util";
+import { PromptMessageSchema } from "@modelcontextprotocol/sdk/types.js";
 
 export const server = new McpServer({
     name: 'IgorFlp/ciphersuite-mcp',
@@ -99,6 +100,27 @@ server.registerResource(
                        `.trim()
             }
 
+        ]
+    })
+)
+server.registerPrompt(
+    "encrypt_message_prompt",
+    {
+        description: "Prompt to encrypt a plain-text message using the encrypt_message tool",
+        argsSchema: {
+            message: z.string().describe("Message to encrypt"),
+            encryptionKey: z.string().describe("Any passpharase to use for encryption")
+        }
+    },
+    ({message, encryptionKey})=>({
+        messages: [
+            {
+                role:"user",
+                content:{
+                    type:"text",
+                    text:`Please encrypt the following message using the encrypt_message tool. \nMessage: ${message}\nEncryption key: ${encryptionKey}`
+                }
+            }
         ]
     })
 )
