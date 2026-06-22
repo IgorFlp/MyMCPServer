@@ -63,5 +63,11 @@ describe("MCP Tool tests", ()=>{
         )
 
     })
+    it("should list the encryption://info resource", async ()=>{
+        const {resources} = await client.listResources()
+        const info = resources.find(item => item.uri === 'encryption://info')
+
+        assert.ok(info, 'encryption://info resource should be listed')
+    })
 }
 )

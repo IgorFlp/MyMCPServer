@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from 'zod'
 import { decrypt, encrypt } from "./service.ts";
+import { MIMEType } from "node:util";
 
 export const server = new McpServer({
     name: 'IgorFlp/ciphersuite-mcp',
@@ -72,4 +73,32 @@ server.registerTool(
             }
         },
     
+)
+server.registerResource(
+    'encryption://info',
+    'encryption://info',
+    {
+        description: 'Describes the encryption algorithm, key requirements, and output format.'
+
+    },
+    async ()=>({
+        contents:[
+            {
+                uri: "encryption://info",
+                mimeType: 'text/plain',
+                text: `
+                    Algorithm: AES-=256-CBC
+                    Key derivation: scrypt (passphrase + fixed server salt -> 32-byte key)
+                    Output format: <16-byte IV in hex>:<ciphertext in hex> (separated by ":")
+                    Notes:
+                        - User pass any passphrase - Server derives a string 32-byte key aytomatically using scrypt
+                        - A random IV is generated for every encryption
+                        - Use the exact same passphrase to decrypt.
+                        - Keep the full "iv:ciphertext" string to decrypt later.
+                       
+                       `.trim()
+            }
+
+        ]
+    })
 )
